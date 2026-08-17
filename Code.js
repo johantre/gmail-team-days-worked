@@ -35,15 +35,15 @@ function teamKleur(teamNaam) {
 }
 
 // ============================================================
-// MONTH CONFIG — previous calendar month + current calendar month
+// MONTH CONFIG — current calendar month + next calendar month
 // ============================================================
 function bepaalMaanden(vandaag) {
   const huidigeStart = new Date(vandaag.getFullYear(), vandaag.getMonth(), 1);
-  const vorigeStart = new Date(vandaag.getFullYear(), vandaag.getMonth() - 1, 1);
   const volgendeStart = new Date(vandaag.getFullYear(), vandaag.getMonth() + 1, 1);
+  const naVolgendeStart = new Date(vandaag.getFullYear(), vandaag.getMonth() + 2, 1);
   return [
-    { naam: formatMaandNaam(vorigeStart), start: vorigeStart, einde: huidigeStart },
     { naam: formatMaandNaam(huidigeStart), start: huidigeStart, einde: volgendeStart },
+    { naam: formatMaandNaam(volgendeStart), start: volgendeStart, einde: naVolgendeStart },
   ];
 }
 
@@ -192,8 +192,17 @@ function doRefresh(vanSidebar) {
 
       const kolBreedte = groep.weken.length;
       const cel = sheet.getRange(rij, groep.startKolIdx, 1, kolBreedte);
+      // Break apart first: on a range that's already fully merged from an
+      // earlier run, merge() is a silent no-op, leaving a stale merge in place.
+      cel.breakApart();
       if (kolBreedte > 1) cel.merge();
-      cel.setValue(groep.maand.naam)
+      // setRichTextValue instead of setValue: a bare month name like
+      // "September" or "November" is also a valid Dutch month name, and
+      // Range.setValue() unconditionally auto-parses date-looking strings
+      // and silently converts them to a date — redisplayed in the
+      // spreadsheet's locale (lowercase Dutch month names) — regardless of
+      // the cell's number format. Rich text bypasses that parser entirely.
+      cel.setRichTextValue(SpreadsheetApp.newRichTextValue().setText(groep.maand.naam).build())
         .setFontFamily("Montserrat").setFontWeight("bold").setFontSize(10)
         .setBackground(BLAUW_LICHT).setFontColor(GRIJS).setHorizontalAlignment("center");
     });
@@ -398,8 +407,16 @@ function formatDatumKort(d) {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
+// Fixed array instead of toLocaleDateString(..., { month: "long" }): Apps
+// Script's V8 sandbox has been observed returning lowercase month names for
+// some months (e.g. "september" instead of "September") even with the
+// "en-GB" locale explicitly set, unlike plain Node.js. A hardcoded list
+// sidesteps that runtime's locale/ICU data entirely.
+const MAAND_NAMEN = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"];
+
 function formatMaandNaam(d) {
-  return d.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+  return `${MAAND_NAMEN[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 function parseLokaleDatum(dateStr) {
