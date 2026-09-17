@@ -1,6 +1,6 @@
 # gmail-team-days-worked
 
-Track the number of days actually worked per employee, per week, for the previous and current calendar month — straight in Google Sheets, based on **Out of Office** events in Google Calendar.
+Track the number of days actually worked per employee, per week, for the current and next calendar month — straight in Google Sheets, based on **Out of Office** events in Google Calendar.
 
 No external tools, no servers — just Google Apps Script connected to the Google Calendar API.
 
@@ -54,10 +54,10 @@ Unlike `gmail-team-capacity`'s Teams tab, there is no sprint/velocity/Jira confi
 
 ## Sheet layout
 
-For each team, the sheet shows two month blocks side by side: the **previous** calendar month, then the **current** calendar month. Each month block is: a **Total** column (days worked / working days that month), followed by that month's weeks.
+For each team, the sheet shows two month blocks side by side: the **current** calendar month, then the **next** calendar month. Each month block is: a **Total** column (days worked / working days that month), followed by that month's weeks.
 
 ```
-Name | Total (prev month) | Week 1 | Week 2 | ... | Total (this month) | Week 1 | Week 2 | ...
+Name | Total (this month) | Week 1 | Week 2 | ... | Total (next month) | Week 1 | Week 2 | ...
 ```
 
 The Total column sits *before* its month's weeks — this also acts as the visual divider between the two month blocks.

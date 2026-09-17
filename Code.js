@@ -38,12 +38,12 @@ function teamKleur(teamNaam) {
 // MONTH CONFIG — current calendar month + next calendar month
 // ============================================================
 function bepaalMaanden(vandaag) {
+  const vorigeStart = new Date(vandaag.getFullYear(), vandaag.getMonth() - 1, 1);
   const huidigeStart = new Date(vandaag.getFullYear(), vandaag.getMonth(), 1);
   const volgendeStart = new Date(vandaag.getFullYear(), vandaag.getMonth() + 1, 1);
-  const naVolgendeStart = new Date(vandaag.getFullYear(), vandaag.getMonth() + 2, 1);
   return [
+    { naam: formatMaandNaam(vorigeStart), start: vorigeStart, einde: huidigeStart },
     { naam: formatMaandNaam(huidigeStart), start: huidigeStart, einde: volgendeStart },
-    { naam: formatMaandNaam(volgendeStart), start: volgendeStart, einde: naVolgendeStart },
   ];
 }
 
